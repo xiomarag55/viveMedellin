@@ -371,7 +371,7 @@ classDiagram
 
 ### 📋 Entidades y Reglas de Negocio
 
-#### **Entidades Actuales** ✅
+#### **Entidades Actuales** 
 
 ##### **1. User (Usuario)**
 **Reglas de Negocio:**
@@ -405,7 +405,7 @@ classDiagram
 - Los comentarios no se eliminan físicamente (soft delete: deleted=true)
 - Todos los comentarios tienen timestamps de creación y actualización
 
-#### **Entidades Planificadas** 🚀
+#### **Entidades Planificadas** 
 
 ##### **4. UserFollow (Seguimiento entre Usuarios)**
 **Reglas de Negocio:**
@@ -448,7 +448,7 @@ classDiagram
 
 ### 🔍 Principales Consultas del Sistema
 
-#### **Consultas Actuales** ✅
+#### **Consultas Actuales** 
 
 1. **Autenticación y Usuarios**
    ```sql
@@ -489,7 +489,7 @@ classDiagram
    SELECT COUNT(*) FROM comments WHERE event_id = ? AND deleted = false
    ```
 
-#### **Consultas Planificadas** 🚀
+#### **Consultas Planificadas** 
 
 4. **Seguimiento de Usuarios**
    ```sql
@@ -713,7 +713,7 @@ erDiagram
 
 ### 🗄️ Modelo Físico (DDL - PostgreSQL)
 
-#### **Schema Actual** ✅
+#### **Schema Actual** 
 
 ```sql
 -- ============================================
@@ -795,7 +795,7 @@ CREATE INDEX idx_comments_deleted ON comments(deleted);
 CREATE INDEX idx_comments_event_created ON comments(event_id, created_at);
 ```
 
-#### **Schema Completo (Planificado)** 🚀
+#### **Schema Completo (Planificado)** 
 
 ```sql
 -- ============================================

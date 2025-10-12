@@ -362,14 +362,14 @@ classDiagram
 #### Consideraciones de Seguridad y Accesibilidad
 
 - **Seguridad**: Autorización granular, validación de entrada, auditoría
-- **♿ Accesibilidad**: DTOs con metadatos UI, estructura semántica
+- ** Accesibilidad**: DTOs con metadatos UI, estructura semántica
 - **Monitoreo**: Métricas de actividad y dashboards administrativos
 
 ---
 
 ## Modelado de Datos
 
-### 📋 Entidades y Reglas de Negocio
+### Entidades y Reglas de Negocio
 
 #### **Entidades Actuales** 
 
@@ -446,7 +446,7 @@ classDiagram
 - Almacena métricas agregadas (total comentarios, usuarios activos, etc.)
 - Se regenera periódicamente para dashboard administrativo
 
-### 🔍 Principales Consultas del Sistema
+### Principales Consultas del Sistema
 
 #### **Consultas Actuales** 
 

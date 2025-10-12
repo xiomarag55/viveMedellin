@@ -239,19 +239,19 @@ classDiagram
 
 #### Funcionalidades de Interacción Social Planificadas
 
-**🎯 Feature 3: Interacción Social y Comunitaria**
+** Feature 3: Interacción Social y Comunitaria**
 
 Las siguientes funcionalidades están planificadas para implementación:
 
-1. **✅ Autenticación y Autorización** - *(Implementado)*
+1. ** Autenticación y Autorización** - *(Implementado)*
    - JWT con Spring Security
    - Sistema de roles básico
 
-2. **✅ Crear y Consultar Comentarios** - *(Implementado)*
+2. ** Crear y Consultar Comentarios** - *(Implementado)*
    - Comentarios en eventos
    - Estructura jerárquica (respuestas)
 
-3. **🚀 Extensiones Planificadas:**
+3. ** Extensiones Planificadas:**
    - **Sistema de Seguimiento**: Seguir usuarios con intereses similares
    - **Moderación Avanzada**: Eliminar comentarios (propios/admin)
    - **Notificaciones**: Nuevos comentarios en eventos guardados
@@ -361,9 +361,9 @@ classDiagram
 
 #### Consideraciones de Seguridad y Accesibilidad
 
-- **🔐 Seguridad**: Autorización granular, validación de entrada, auditoría
+- **Seguridad**: Autorización granular, validación de entrada, auditoría
 - **♿ Accesibilidad**: DTOs con metadatos UI, estructura semántica
-- **📊 Monitoreo**: Métricas de actividad y dashboards administrativos
+- **Monitoreo**: Métricas de actividad y dashboards administrativos
 
 ---
 
@@ -568,7 +568,7 @@ classDiagram
    WHERE c.created_at BETWEEN ? AND ?
    ```
 
-### 📊 Modelo Lógico (MER - Modelo Entidad-Relación)
+### Modelo Lógico (MER - Modelo Entidad-Relación)
 
 #### **Diagrama Entidad-Relación - Estado Actual**
 
@@ -711,7 +711,7 @@ erDiagram
     }
 ```
 
-### 🗄️ Modelo Físico (DDL - PostgreSQL)
+### Modelo Físico (DDL - PostgreSQL)
 
 #### **Schema Actual** 
 
@@ -996,7 +996,7 @@ INSERT INTO users (name, username, email, password_hash, role) VALUES
 -- 10. Vistas materializadas pueden agregarse para dashboards
 ```
 
-#### **Índices Adicionales para Optimización** 🚀
+#### **Índices Adicionales para Optimización** 
 
 ```sql
 -- Índices adicionales para queries de dashboard social
@@ -1027,7 +1027,7 @@ ON comments(event_id)
 WHERE deleted = false;
 ```
 
-#### **Estrategias de Particionamiento (Futuro)** 📊
+#### **Estrategias de Particionamiento (Futuro)** 
 
 Para cuando la base de datos crezca significativamente:
 
@@ -1289,7 +1289,7 @@ graph TD
     class JAR,SERVER,CONTAINER deployment
 ```
 
-#### 📊 **Análisis del Estilo Arquitectónico Actual**
+#### **Análisis del Estilo Arquitectónico Actual**
 
 | Aspecto | Monolito Actual | Estado |
 |---------|-----------------|--------|

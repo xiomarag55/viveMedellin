@@ -3,6 +3,7 @@
 Backend en Spring Boot 3 (Java 17) con autenticación JWT, PostgreSQL y JPA/Hibernate. Actualmente Flyway está deshabilitado y el esquema se gestiona con Hibernate (create-drop).
 
 ## Stack
+
 - Java 17+, Spring Boot 3, Maven
 - Spring Web, Spring Data JPA, Spring Security, Validation
 - PostgreSQL
@@ -11,12 +12,15 @@ Backend en Spring Boot 3 (Java 17) con autenticación JWT, PostgreSQL y JPA/Hibe
 - Actuator (health)
 
 ## Requisitos
+
 - Java (JDK) 17+
 - Maven 3.9+
 - Docker (para DB local) o una instancia de PostgreSQL
 
 ## Arranque rápido
-1) Base de datos con Docker Compose:
+
+1. Base de datos con Docker Compose:
+
 ```zsh
 cd /Users/yiyi/viveMedellin/api
 # Si ves un warning por 'version:' es inocuo en Compose v2
@@ -24,7 +28,8 @@ docker compose up -d
 docker compose ps
 ```
 
-2) Ejecutar la app (Maven):
+2. Ejecutar la app (Maven):
+
 ```zsh
 cd /Users/yiyi/viveMedellin/api
 export DB_URL=jdbc:postgresql://localhost:5432/eventos
@@ -39,13 +44,15 @@ PY
 mvn -DskipTests spring-boot:run
 ```
 
-3) Verificar salud:
+3. Verificar salud:
+
 ```zsh
-curl -fsS http://localhost:8080/actuator/health
+curl -fsS https://vivemedellin-wcse.onrender.com/actuator/health
 # {"status":"UP"}
 ```
 
 ## Configuración (application.yml)
+
 - JPA/Hibernate: `ddl-auto: create-drop` (crea y elimina el esquema al iniciar/detener la app)
 - Flyway: `enabled: false`
 - Dialect: `org.hibernate.dialect.PostgreSQLDialect`
@@ -57,21 +64,27 @@ curl -fsS http://localhost:8080/actuator/health
   - CORS_ALLOWED_ORIGINS (por defecto `http://localhost:5173`)
 
 ## Ejecutar con JAR
+
 ```zsh
 cd /Users/yiyi/viveMedellin/api
 mvn -DskipTests clean package
 java -jar target/eventos-0.0.1-SNAPSHOT.jar
 ```
+
 Cambiar puerto:
+
 ```zsh
 mvn -DskipTests spring-boot:run -Dspring-boot.run.arguments=--server.port=8081
 ```
 
 ## Endpoints
+
 - Health (libre):
+
   - `GET /actuator/health` → `{ "status": "UP" }`
 
 - Auth (libres):
+
   - `POST /api/auth/signup` → 200 sin cuerpo (crea usuario)
     - Body: `{ "name", "username", "email", "password" }`
   - `POST /api/auth/login` → 200 `{ accessToken, refreshToken, user }`
@@ -91,29 +104,35 @@ mvn -DskipTests spring-boot:run -Dspring-boot.run.arguments=--server.port=8081
 > Nota: si se desea proteger los endpoints de eventos, actualizar `SecurityConfig` para exigir autenticación (quitar `permitAll()` en `/api/events/**`).
 
 ## Ejemplos (curl)
+
 Signup (200 sin cuerpo):
+
 ```zsh
-curl -i -X POST http://localhost:8080/api/auth/signup \
+curl -i -X POST https://vivemedellin-wcse.onrender.com/api/auth/signup \
   -H 'Content-Type: application/json' \
   -d '{"name":"Demo","username":"demo","email":"demo@local","password":"Demo123!"}'
 ```
 
 Login y usar token:
+
 ```zsh
-TOKEN=$(curl -s -X POST http://localhost:8080/api/auth/login \
+TOKEN=$(curl -s -X POST https://vivemedellin-wcse.onrender.com/api/auth/login \
   -H 'Content-Type: application/json' \
   -d '{"username":"demo","password":"Demo123!"}' | \
   python3 -c 'import sys, json; print(json.load(sys.stdin)["accessToken"])')
 
 # Si proteges eventos en el futuro:
-curl -s http://localhost:8080/api/events -H "Authorization: Bearer $TOKEN"
+curl -s https://vivemedellin-wcse.onrender.com/api/events -H "Authorization: Bearer $TOKEN"
 ```
 
 ## Troubleshooting
+
 - Puerto 8080 en uso:
+
 ```zsh
 lsof -ti tcp:8080 | xargs kill -9
 ```
+
 - Docker Compose: ejecuta desde `api/` o usa `-f /ruta/al/docker-compose.yml`.
 - DB inaccesible: revisa `docker compose ps`, credenciales y `DB_URL`.
 - 403 en endpoints protegidos: falta `Authorization: Bearer <accessToken>` o token inválido.
@@ -243,11 +262,13 @@ classDiagram
 
 Las siguientes funcionalidades están planificadas para implementación:
 
-1. ** Autenticación y Autorización** - *(Implementado)*
+1. ** Autenticación y Autorización** - _(Implementado)_
+
    - JWT con Spring Security
    - Sistema de roles básico
 
-2. ** Crear y Consultar Comentarios** - *(Implementado)*
+2. ** Crear y Consultar Comentarios** - _(Implementado)_
+
    - Comentarios en eventos
    - Estructura jerárquica (respuestas)
 
@@ -371,10 +392,12 @@ classDiagram
 
 ### Entidades y Reglas de Negocio
 
-#### **Entidades Actuales** 
+#### **Entidades Actuales**
 
 ##### **1. User (Usuario)**
+
 **Reglas de Negocio:**
+
 - Un usuario debe tener un nombre de usuario único en el sistema
 - El email debe ser único y válido
 - La contraseña debe almacenarse hasheada (BCrypt)
@@ -385,7 +408,9 @@ classDiagram
 - Un usuario puede escribir múltiples comentarios
 
 ##### **2. Event (Evento)**
+
 **Reglas de Negocio:**
+
 - Todo evento debe tener un título y descripción
 - Un evento debe tener fecha/hora de inicio y fin
 - La fecha de inicio debe ser anterior a la fecha de fin
@@ -396,7 +421,9 @@ classDiagram
 - Un evento puede tener múltiples comentarios
 
 ##### **3. Comment (Comentario)**
+
 **Reglas de Negocio:**
+
 - Todo comentario debe tener contenido (texto)
 - Un comentario pertenece a un evento específico
 - Un comentario es escrito por un usuario específico
@@ -405,10 +432,12 @@ classDiagram
 - Los comentarios no se eliminan físicamente (soft delete: deleted=true)
 - Todos los comentarios tienen timestamps de creación y actualización
 
-#### **Entidades Planificadas** 
+#### **Entidades Planificadas**
 
 ##### **4. UserFollow (Seguimiento entre Usuarios)**
+
 **Reglas de Negocio:**
+
 - Un usuario (follower) puede seguir a otro usuario (followed)
 - No puede haber seguimientos duplicados activos
 - Un usuario no puede seguirse a sí mismo
@@ -416,7 +445,9 @@ classDiagram
 - Debe registrarse la fecha del seguimiento
 
 ##### **5. EventSaved (Eventos Guardados)**
+
 **Reglas de Negocio:**
+
 - Un usuario puede guardar eventos de su interés
 - Un evento puede ser guardado por múltiples usuarios
 - No puede haber duplicados de usuario-evento guardado
@@ -424,7 +455,9 @@ classDiagram
 - Los usuarios reciben notificaciones de nuevos comentarios en eventos guardados
 
 ##### **6. Notification (Notificación)**
+
 **Reglas de Negocio:**
+
 - Toda notificación tiene un destinatario (recipient)
 - Las notificaciones pueden ser de diferentes tipos (comentario, respuesta, evento compartido, nuevo seguidor)
 - Las notificaciones tienen estado: leída/no leída
@@ -432,14 +465,18 @@ classDiagram
 - Debe registrarse la fecha de creación
 
 ##### **7. CommentNotification (Notificación de Comentario)**
+
 **Reglas de Negocio:**
+
 - Se genera cuando alguien comenta en un evento guardado por el usuario
 - Se genera cuando alguien responde a un comentario del usuario
 - Referencia al comentario que generó la notificación
 - Puede referenciar al comentario padre en caso de respuestas
 
 ##### **8. SocialActivitySummary (Resumen de Actividad Social)**
+
 **Reglas de Negocio:**
+
 - Genera estadísticas diarias de actividad en la plataforma
 - Identifica eventos con más comentarios
 - Identifica usuarios más activos
@@ -448,73 +485,78 @@ classDiagram
 
 ### Principales Consultas del Sistema
 
-#### **Consultas Actuales** 
+#### **Consultas Actuales**
 
 1. **Autenticación y Usuarios**
+
    ```sql
    -- Buscar usuario por username para login
    SELECT * FROM users WHERE username = ?
-   
+
    -- Buscar usuario por email
    SELECT * FROM users WHERE email = ?
-   
+
    -- Listar todos los usuarios activos
    SELECT * FROM users WHERE is_active = true
    ```
 
 2. **Gestión de Eventos**
+
    ```sql
    -- Obtener eventos paginados
    SELECT * FROM events WHERE is_active = true ORDER BY starts_at DESC LIMIT ? OFFSET ?
-   
+
    -- Obtener evento por ID
    SELECT * FROM events WHERE id = ?
-   
+
    -- Obtener eventos creados por un usuario
    SELECT * FROM events WHERE created_by = ? ORDER BY created_at DESC
-   
+
    -- Buscar eventos por rango de fechas
    SELECT * FROM events WHERE starts_at BETWEEN ? AND ? AND is_active = true
    ```
 
 3. **Sistema de Comentarios**
+
    ```sql
    -- Obtener comentarios de un evento (sin respuestas)
    SELECT * FROM comments WHERE event_id = ? AND parent_id IS NULL AND deleted = false
-   
+
    -- Obtener respuestas de un comentario
    SELECT * FROM comments WHERE parent_id = ? AND deleted = false ORDER BY created_at ASC
-   
+
    -- Contar comentarios de un evento
    SELECT COUNT(*) FROM comments WHERE event_id = ? AND deleted = false
    ```
 
-#### **Consultas Planificadas** 
+#### **Consultas Planificadas**
 
 4. **Seguimiento de Usuarios**
+
    ```sql
    -- Obtener usuarios que sigue un usuario
    SELECT u.* FROM users u
    JOIN user_follows uf ON u.id = uf.followed_id
    WHERE uf.follower_id = ? AND uf.is_active = true
-   
+
    -- Obtener seguidores de un usuario
    SELECT u.* FROM users u
    JOIN user_follows uf ON u.id = uf.follower_id
    WHERE uf.followed_id = ? AND uf.is_active = true
-   
+
    -- Verificar si un usuario sigue a otro
-   SELECT EXISTS(SELECT 1 FROM user_follows 
+   SELECT EXISTS(SELECT 1 FROM user_follows
                  WHERE follower_id = ? AND followed_id = ? AND is_active = true)
    ```
 
 5. **Eventos Guardados**
+
    ```sql
    -- Obtener eventos guardados por un usuario
    SELECT e.* FROM events e
    JOIN events_saved es ON e.id = es.event_id
    WHERE es.user_id = ? ORDER BY es.saved_at DESC
-   
+
    -- Obtener usuarios que guardaron un evento
    SELECT u.* FROM users u
    JOIN events_saved es ON u.id = es.user_id
@@ -522,22 +564,24 @@ classDiagram
    ```
 
 6. **Sistema de Notificaciones**
+
    ```sql
    -- Obtener notificaciones no leídas de un usuario
-   SELECT * FROM notifications 
-   WHERE recipient_id = ? AND is_read = false 
-   ORDER BY created_at DESC
-   
-   -- Contar notificaciones no leídas
-   SELECT COUNT(*) FROM notifications 
+   SELECT * FROM notifications
    WHERE recipient_id = ? AND is_read = false
-   
+   ORDER BY created_at DESC
+
+   -- Contar notificaciones no leídas
+   SELECT COUNT(*) FROM notifications
+   WHERE recipient_id = ? AND is_read = false
+
    -- Marcar notificaciones como leídas
-   UPDATE notifications SET is_read = true 
+   UPDATE notifications SET is_read = true
    WHERE id = ? AND recipient_id = ?
    ```
 
 7. **Dashboard de Actividad Social**
+
    ```sql
    -- Eventos con más comentarios en período
    SELECT e.id, e.title, COUNT(c.id) as comment_count
@@ -547,7 +591,7 @@ classDiagram
    GROUP BY e.id, e.title
    ORDER BY comment_count DESC
    LIMIT ?
-   
+
    -- Usuarios más activos (por comentarios)
    SELECT u.id, u.username, u.name, COUNT(c.id) as activity_count
    FROM users u
@@ -556,9 +600,9 @@ classDiagram
    GROUP BY u.id, u.username, u.name
    ORDER BY activity_count DESC
    LIMIT ?
-   
+
    -- Actividad general de la plataforma
-   SELECT 
+   SELECT
      COUNT(DISTINCT u.id) as active_users,
      COUNT(DISTINCT e.id) as active_events,
      COUNT(c.id) as total_comments
@@ -627,10 +671,10 @@ erDiagram
     USER ||--o{ USER_FOLLOW_FOLLOWED : followed_by
     USER ||--o{ EVENT_SAVED : saves
     USER ||--o{ NOTIFICATION : receives
-    
+
     EVENT ||--o{ COMMENT : has
     EVENT ||--o{ EVENT_SAVED : saved_by
-    
+
     COMMENT ||--o{ COMMENT : replies_to
     COMMENT ||--o{ COMMENT_NOTIFICATION : triggers
 
@@ -713,7 +757,7 @@ erDiagram
 
 ### Modelo Físico (DDL - PostgreSQL)
 
-#### **Schema Actual** 
+#### **Schema Actual**
 
 ```sql
 -- ============================================
@@ -732,7 +776,7 @@ CREATE TABLE users (
     is_active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT uk_users_username UNIQUE (username),
     CONSTRAINT uk_users_email UNIQUE (email),
     CONSTRAINT chk_users_role CHECK (role IN ('USER', 'ADMIN', 'MODERATOR'))
@@ -756,8 +800,8 @@ CREATE TABLE events (
     is_active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
-    CONSTRAINT fk_events_user FOREIGN KEY (created_by) 
+
+    CONSTRAINT fk_events_user FOREIGN KEY (created_by)
         REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT chk_events_dates CHECK (starts_at < ends_at)
 );
@@ -778,12 +822,12 @@ CREATE TABLE comments (
     author_id BIGINT NOT NULL,
     event_id BIGINT NOT NULL,
     parent_id BIGINT,
-    
-    CONSTRAINT fk_comments_author FOREIGN KEY (author_id) 
+
+    CONSTRAINT fk_comments_author FOREIGN KEY (author_id)
         REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_comments_event FOREIGN KEY (event_id) 
+    CONSTRAINT fk_comments_event FOREIGN KEY (event_id)
         REFERENCES events(id) ON DELETE CASCADE,
-    CONSTRAINT fk_comments_parent FOREIGN KEY (parent_id) 
+    CONSTRAINT fk_comments_parent FOREIGN KEY (parent_id)
         REFERENCES comments(id) ON DELETE CASCADE
 );
 
@@ -795,7 +839,7 @@ CREATE INDEX idx_comments_deleted ON comments(deleted);
 CREATE INDEX idx_comments_event_created ON comments(event_id, created_at);
 ```
 
-#### **Schema Completo (Planificado)** 
+#### **Schema Completo (Planificado)**
 
 ```sql
 -- ============================================
@@ -819,10 +863,10 @@ CREATE TABLE user_follows (
     followed_id BIGINT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_active BOOLEAN NOT NULL DEFAULT true,
-    
-    CONSTRAINT fk_user_follows_follower FOREIGN KEY (follower_id) 
+
+    CONSTRAINT fk_user_follows_follower FOREIGN KEY (follower_id)
         REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_user_follows_followed FOREIGN KEY (followed_id) 
+    CONSTRAINT fk_user_follows_followed FOREIGN KEY (followed_id)
         REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT uk_user_follows UNIQUE (follower_id, followed_id),
     CONSTRAINT chk_user_follows_no_self CHECK (follower_id != followed_id)
@@ -840,10 +884,10 @@ CREATE TABLE events_saved (
     user_id BIGINT NOT NULL,
     event_id BIGINT NOT NULL,
     saved_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
-    CONSTRAINT fk_events_saved_user FOREIGN KEY (user_id) 
+
+    CONSTRAINT fk_events_saved_user FOREIGN KEY (user_id)
         REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_events_saved_event FOREIGN KEY (event_id) 
+    CONSTRAINT fk_events_saved_event FOREIGN KEY (event_id)
         REFERENCES events(id) ON DELETE CASCADE,
     CONSTRAINT uk_events_saved UNIQUE (user_id, event_id)
 );
@@ -861,13 +905,13 @@ CREATE TABLE notifications (
     type VARCHAR(50) NOT NULL,
     is_read BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
-    CONSTRAINT fk_notifications_recipient FOREIGN KEY (recipient_id) 
+
+    CONSTRAINT fk_notifications_recipient FOREIGN KEY (recipient_id)
         REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT chk_notifications_type CHECK (type IN (
-        'COMMENT_ON_SAVED_EVENT', 
-        'REPLY_TO_COMMENT', 
-        'EVENT_SHARED', 
+        'COMMENT_ON_SAVED_EVENT',
+        'REPLY_TO_COMMENT',
+        'EVENT_SHARED',
         'NEW_FOLLOWER'
     ))
 );
@@ -885,16 +929,16 @@ CREATE TABLE comment_notifications (
     comment_id BIGINT NOT NULL,
     parent_comment_id BIGINT,
     trigger_type VARCHAR(30) NOT NULL,
-    
-    CONSTRAINT fk_comment_notif_notification FOREIGN KEY (notification_id) 
+
+    CONSTRAINT fk_comment_notif_notification FOREIGN KEY (notification_id)
         REFERENCES notifications(id) ON DELETE CASCADE,
-    CONSTRAINT fk_comment_notif_comment FOREIGN KEY (comment_id) 
+    CONSTRAINT fk_comment_notif_comment FOREIGN KEY (comment_id)
         REFERENCES comments(id) ON DELETE CASCADE,
-    CONSTRAINT fk_comment_notif_parent FOREIGN KEY (parent_comment_id) 
+    CONSTRAINT fk_comment_notif_parent FOREIGN KEY (parent_comment_id)
         REFERENCES comments(id) ON DELETE CASCADE,
     CONSTRAINT chk_comment_notif_trigger CHECK (trigger_type IN (
-        'NEW_COMMENT', 
-        'NEW_REPLY', 
+        'NEW_COMMENT',
+        'NEW_REPLY',
         'COMMENT_EDITED'
     ))
 );
@@ -910,7 +954,7 @@ CREATE TABLE social_activity_summaries (
     summary_date DATE NOT NULL,
     metrics JSONB NOT NULL,
     generated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT uk_social_activity_date UNIQUE (summary_date)
 );
 
@@ -922,7 +966,7 @@ CREATE INDEX idx_social_activity_metrics ON social_activity_summaries USING GIN 
 
 -- Vista: Estadísticas de eventos
 CREATE OR REPLACE VIEW v_event_stats AS
-SELECT 
+SELECT
     e.id,
     e.title,
     e.created_by,
@@ -940,7 +984,7 @@ GROUP BY e.id, e.title, e.created_by, u.username, e.starts_at, e.ends_at;
 
 -- Vista: Estadísticas de usuarios
 CREATE OR REPLACE VIEW v_user_stats AS
-SELECT 
+SELECT
     u.id,
     u.username,
     u.name,
@@ -996,24 +1040,24 @@ INSERT INTO users (name, username, email, password_hash, role) VALUES
 -- 10. Vistas materializadas pueden agregarse para dashboards
 ```
 
-#### **Índices Adicionales para Optimización** 
+#### **Índices Adicionales para Optimización**
 
 ```sql
 -- Índices adicionales para queries de dashboard social
 
 -- Índice para búsqueda de comentarios recientes por usuario
-CREATE INDEX idx_comments_author_recent 
-ON comments(author_id, created_at DESC) 
+CREATE INDEX idx_comments_author_recent
+ON comments(author_id, created_at DESC)
 WHERE deleted = false;
 
 -- Índice para eventos próximos
-CREATE INDEX idx_events_upcoming 
-ON events(starts_at) 
+CREATE INDEX idx_events_upcoming
+ON events(starts_at)
 WHERE is_active = true AND starts_at > CURRENT_TIMESTAMP;
 
 -- Índice para notificaciones no leídas por fecha
-CREATE INDEX idx_notifications_unread_recent 
-ON notifications(recipient_id, created_at DESC) 
+CREATE INDEX idx_notifications_unread_recent
+ON notifications(recipient_id, created_at DESC)
 WHERE is_read = false;
 
 -- Índice para búsqueda full-text en eventos (requiere extensión)
@@ -1022,12 +1066,12 @@ CREATE INDEX idx_events_title_search ON events USING GIN (title gin_trgm_ops);
 CREATE INDEX idx_events_description_search ON events USING GIN (description gin_trgm_ops);
 
 -- Índice para conteo rápido de comentarios por evento
-CREATE INDEX idx_comments_count_by_event 
-ON comments(event_id) 
+CREATE INDEX idx_comments_count_by_event
+ON comments(event_id)
 WHERE deleted = false;
 ```
 
-#### **Estrategias de Particionamiento (Futuro)** 
+#### **Estrategias de Particionamiento (Futuro)**
 
 Para cuando la base de datos crezca significativamente:
 
@@ -1063,38 +1107,38 @@ graph TD
             CTRL --> CC[CommentController]
             CTRL --> UC[UserController]
         end
-        
+
         subgraph "Business Layer"
             SVC[service/]
             SVC --> US[UserService]
             SVC --> ES[EventService]
             SVC --> CS[CommentService]
         end
-        
+
         subgraph "Data Access Layer"
             REPO[repository/]
             REPO --> UR[UserRepository]
             REPO --> ER[EventRepository]
             REPO --> CR[CommentRepository]
         end
-        
+
         subgraph "Domain Layer"
             MODEL[model/]
             MODEL --> U[User]
             MODEL --> E[Event]
             MODEL --> C[Comment]
         end
-        
+
         subgraph "Infrastructure"
             CONFIG[config/]
             CONFIG --> SC[SecurityConfig]
             CONFIG --> GEH[GlobalExceptionHandler]
-            
+
             SEC[security/]
             SEC --> JS[JwtService]
             SEC --> JAF[JwtAuthenticationFilter]
         end
-        
+
         subgraph "Data Transfer"
             DTO[dto/]
             DTO --> ED[EventDto]
@@ -1104,13 +1148,13 @@ graph TD
             DTO --> SR[SignupRequest]
         end
     end
-    
+
     subgraph "External Dependencies"
         DB[(PostgreSQL)]
         SPRING[Spring Boot Framework]
         JWT[JJWT Library]
     end
-    
+
     %% Dependencies
     CTRL --> SVC
     SVC --> REPO
@@ -1119,7 +1163,7 @@ graph TD
     SVC --> DTO
     SEC --> SVC
     CONFIG --> SEC
-    
+
     REPO --> DB
     SEC --> JWT
     CONFIG --> SPRING
@@ -1140,13 +1184,13 @@ graph TD
             CTRL --> NC[NotificationController]
             CTRL --> MC[ModerationController]
         end
-        
+
         subgraph "Business Layer"
             SVC[service/]
             SVC --> US[UserService]
             SVC --> ES[EventService]
             SVC --> CS[CommentService]
-            
+
             subgraph "Social Services"
                 SS[social/]
                 SS --> UIS[UserInteractionService]
@@ -1155,7 +1199,7 @@ graph TD
                 SS --> CMS[CommentModerationService]
             end
         end
-        
+
         subgraph "Data Access Layer"
             REPO[repository/]
             REPO --> UR[UserRepository]
@@ -1166,13 +1210,13 @@ graph TD
             REPO --> NR[NotificationRepository]
             REPO --> SAR[SocialActivityRepository]
         end
-        
+
         subgraph "Domain Layer"
             MODEL[model/]
             MODEL --> U[User]
             MODEL --> E[Event]
             MODEL --> C[Comment]
-            
+
             subgraph "Social Models"
                 SM[social/]
                 SM --> UF[UserFollow]
@@ -1182,25 +1226,25 @@ graph TD
                 SM --> SAS[SocialActivitySummary]
             end
         end
-        
+
         subgraph "Infrastructure"
             CONFIG[config/]
             CONFIG --> SC[SecurityConfig]
             CONFIG --> GEH[GlobalExceptionHandler]
             CONFIG --> NC[NotificationConfig]
-            
+
             SEC[security/]
             SEC --> JS[JwtService]
             SEC --> JAF[JwtAuthenticationFilter]
             SEC --> PS[PermissionService]
-            
+
             INTERFACES[interfaces/]
             INTERFACES --> INS[INotificationService]
             INTERFACES --> IUI[IUserInteractionService]
             INTERFACES --> ISA[ISocialActivityService]
             INTERFACES --> ICM[ICommentModerationService]
         end
-        
+
         subgraph "Data Transfer"
             DTO[dto/]
             DTO --> ED[EventDto]
@@ -1210,7 +1254,7 @@ graph TD
             DTO --> SAD[SocialActivityDto]
             DTO --> USD[UserSummaryDto]
         end
-        
+
         subgraph "External Integrations"
             EXT[external/]
             EXT --> EMAIL[EmailService]
@@ -1218,7 +1262,7 @@ graph TD
             EXT --> ANALYTICS[AnalyticsService]
         end
     end
-    
+
     subgraph "External Dependencies"
         DB[(PostgreSQL)]
         REDIS[(Redis Cache)]
@@ -1226,7 +1270,7 @@ graph TD
         SPRING[Spring Boot Framework]
         JWT[JJWT Library]
     end
-    
+
     %% Dependencies
     CTRL --> SVC
     CTRL --> SS
@@ -1241,7 +1285,7 @@ graph TD
     CONFIG --> SEC
     SS --> INTERFACES
     SS --> EXT
-    
+
     REPO --> DB
     SS --> REDIS
     EXT --> RABBIT
@@ -1266,36 +1310,36 @@ graph TD
             DATA[Data Access Layer]
             DB[(Single Database)]
         end
-        
+
         subgraph "Deployment"
             JAR[Single JAR File]
             SERVER[Application Server]
             CONTAINER[Docker Container]
         end
     end
-    
+
     UI --> API
     API --> BUSINESS
     BUSINESS --> DATA
     DATA --> DB
-    
+
     JAR --> SERVER
     SERVER --> CONTAINER
-    
+
     classDef monolith fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
     classDef deployment fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    
+
     class UI,API,BUSINESS,DATA,DB monolith
     class JAR,SERVER,CONTAINER deployment
 ```
 
 #### **Análisis del Estilo Arquitectónico Actual**
 
-| Aspecto | Monolito Actual | Estado |
-|---------|-----------------|--------|
-| **Deployment** | Una sola unidad desplegable (JAR) |  Implementado |
-| **Base de Datos** | Una sola instancia PostgreSQL |  Implementado |
-| **Comunicación** | Llamadas de métodos internos |  Implementado |
-| **Tecnología** | Stack unificado (Spring Boot) |  Implementado |
-| **Escalabilidad** | Vertical (más recursos al servidor) |  Actual |
-| **Desarrollo** | Equipo trabajando en misma base código |  Actual |
+| Aspecto           | Monolito Actual                        | Estado       |
+| ----------------- | -------------------------------------- | ------------ |
+| **Deployment**    | Una sola unidad desplegable (JAR)      | Implementado |
+| **Base de Datos** | Una sola instancia PostgreSQL          | Implementado |
+| **Comunicación**  | Llamadas de métodos internos           | Implementado |
+| **Tecnología**    | Stack unificado (Spring Boot)          | Implementado |
+| **Escalabilidad** | Vertical (más recursos al servidor)    | Actual       |
+| **Desarrollo**    | Equipo trabajando en misma base código | Actual       |
